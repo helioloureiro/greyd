@@ -1,5 +1,5 @@
 AC_PREREQ([2.68])
-AC_INIT([greyd], [0.10.0], [mikey@greyd.org])
+AC_INIT([greyd], [0.11.6], [mikey@greyd.org])
 AC_USE_SYSTEM_EXTENSIONS
 AM_INIT_AUTOMAKE
 LT_INIT([dlopen])
@@ -53,12 +53,16 @@ else
     AC_MSG_FAILURE([libcrypto (OpenSSL) is missing, required for sync])
 fi
 
+AC_CHECK_FUNC([HMAC_CTX_new], [], [
+    AC_DEFINE([OPENSSL_PRE_1_1_COMPAT], [1], [Define to 1 if we are pre openssl 1.1])
+], [Added in openssl 1.1])
+
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h netdb.h netinet/in.h stdint.h stdlib.h string.h sys/file.h sys/ioctl.h sys/socket.h syslog.h unistd.h])
 
 # Optional drivers to build.
-optional_drivers=
-optional_ldadd=
+optional_drivers=greyd_fw_dummy.la
+optional_ldadd="-dlopen ../drivers/greyd_fw_dummy.la"
 AC_SUBST([optional_drivers])
 AC_SUBST([optional_ldadd])
 
@@ -289,6 +293,22 @@ if test "x${netfilter_driver}" = xyes; then
     if test "x${have_netfilter}" = xyes; then
         netfilter_LIBS="$netfilter_LIBS -lipset"
         AC_DEFINE([HAVE_LIBIPSET], [1], [Netfilter IPSET management library])
+        AC_MSG_CHECKING([for libipset version 7 or later])
+        AC_COMPILE_IFELSE([AC_LANG_SOURCE(
+            [[
+                 #include <libipset/session.h>
+                 void test_func(void)
+                 {
+                     ipset_session_init(NULL, NULL);
+                 }
+            ]])],
+            [
+                 AC_MSG_RESULT([yes])
+            ],
+            [
+                 AC_MSG_RESULT([no])
+                 AC_DEFINE([LIBIPSET_PRE_V7_COMPAT], [1], [Define to 1 if libipset library version prior to v7])
+            ])
     else
         AC_MSG_FAILURE([libipset is required to build the netfilter driver])
     fi
@@ -452,7 +472,7 @@ AC_TYPE_SSIZE_T
 # Checks for library functions.
 AC_FUNC_CHOWN
 AC_FUNC_FORK
-AC_CHECK_FUNCS([dup2 getcwd gethostname inet_ntoa memset mkdir socket strchr strdup strerror strncasecmp strpbrk strtol tzset strnlen setresgid setresuid setregid setreuid])
+AC_CHECK_FUNCS([rresvport dup2 getcwd gethostname inet_ntoa memset mkdir socket strchr strdup strerror strncasecmp strpbrk strtol tzset strnlen setresgid setresuid setregid setreuid])
 
 AC_CONFIG_FILES([Makefile
         src/Makefile

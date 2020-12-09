@@ -1,3 +1,34 @@
+2020-01-25  Mikey Austin  <mikey@greyd.org>
+
+	* Improved file logging module
+	* Updated logger to always write to stderr
+
+2020-01-24  Mikey Austin  <mikey@greyd.org>
+
+	* Added new log_to_file configuration
+
+2020-01-23  Mikey Austin  <mikey@greyd.org>
+
+	* Fix bug in proxy initialization
+	* Added container support
+
+2020-01-01  Mikey Austin  <mikey@greyd.org>
+
+	* Fix bug in sync module hmac ctx cleanup
+	* Added new -F (foreground) option to greyd
+
+2020-01-01  Mikey Austin  <mikey@greyd.org>
+
+	* Updated sync module to work with earlier < 1.1 versions of openssl
+
+2019-12-30  Mikey Austin  <mikey@greyd.org>
+
+	* Updated netfilter driver to work with the latest ipset 7+
+
+2019-12-30  Mikey Austin  <mikey@greyd.org>
+
+	* New proxy protocol support
+
 2015-06-26  Mikey Austin  <mikey@greyd.org>
 
 	* Fixed race between grey & main processes with the fw pipe
